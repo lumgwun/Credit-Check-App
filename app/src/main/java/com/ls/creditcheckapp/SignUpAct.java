@@ -141,7 +141,7 @@ public class SignUpAct extends AppCompatActivity {
         });
         adView = findViewById(R.id.adViewSignUp);
         adView.loadAd(adRequest);
-        adView.setAdSize(AdSize.BANNER);
+        //adView.setAdSize(AdSize.BANNER);
 
         //adView.setAdUnitId("ca-app-pub-2198582162916746/8150169093");
 
