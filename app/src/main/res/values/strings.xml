@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Credit Check App</string>
+    <string name="button_ok">Ok</string>
+    <string name="next">NEXT</string>
+
+    <string name="skip">SKIP</string>
+
+    <string name="start">GOT IT</string>
+</resources>
