@@ -81,7 +81,7 @@ public class LoginAct extends AppCompatActivity {
         adView.loadAd(adRequest);
         //adView.setAdSize(AdSize.BANNER);
 
-        adView.setAdUnitId("ca-app-pub-2198582162916746/8150169093");
+        //adView.setAdUnitId("ca-app-pub-2198582162916746/8150169093");
 
         adView.setAdListener(new AdListener() {
             @Override
