@@ -16,24 +16,14 @@
             android:paddingEnd="10dp"
             android:gravity="center_horizontal"
             android:orientation="vertical">
-
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="150dp"
                 android:padding="40dp"
                 android:layout_marginTop="35dp"
-                android:id="@+id/image3"
-                android:background="@drawable/check"
-                android:src="@drawable/estate1" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="150dp"
-                android:padding="40dp"
-                android:layout_marginTop="35dp"
-                android:id="@+id/realE"
-                android:background="@drawable/estate1"
-                android:src="@drawable/estate1" />
+                android:id="@+id/rLogo"
+                android:background="@drawable/rect6h"
+                android:src="@drawable/check" />
 
 
             <TextView
@@ -41,27 +31,19 @@
                 android:layout_height="wrap_content"
                 android:text="Our Coming soon Apps Overviews, below"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/rect55"
+                android:background="@drawable/rect_white"
                 android:gravity="center_horizontal"
                 android:textColor="@color/purple_new"
                 android:textSize="15sp"
                 android:padding="15dp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:padding="5dp"
-                android:background="@null"
-                android:textAlignment="center"
-                android:textSize="15sp" />
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:orientation="vertical"
                 android:padding="5dp"
                 android:layout_marginBottom="20dp"
-                android:background="@drawable/shape_layer_1a"
+                android:background="@drawable/rect_white"
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/switcher244"
@@ -77,6 +59,15 @@
                     android:text="Our Trading App for Traders and Trade Owners,with us,you take 60% of the profits, even as we trade for you."
                     android:background="@drawable/rect_white"
                     android:src="@drawable/rect6b" />
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:padding="40dp"
+                    android:layout_marginTop="35dp"
+                    android:id="@+id/imageTrade"
+                    android:background="@drawable/rect55"
+                    android:src="@drawable/fx4" />
+
 
                 <TextView
                     android:id="@+id/textView4"
@@ -97,6 +88,16 @@
                     android:textColor="@android:color/holo_red_dark"
                     android:textStyle="bold" />
 
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:padding="40dp"
+                    android:layout_marginTop="35dp"
+                    android:id="@+id/realE"
+                    android:background="@drawable/rect66"
+                    android:src="@drawable/estate1" />
+
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -113,9 +114,6 @@
                     tools:ignore="RtlCompat" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-
 
         </LinearLayout>
     </ScrollView>

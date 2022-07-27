@@ -62,6 +62,7 @@ public class LoginAct extends AppCompatActivity {
         setContentView(R.layout.act_login);
         profile= new Profile();
         adView = new AdView(this);
+        gson=new Gson();
         adRequest = new AdRequest.Builder().build();
         edtUserName = findViewById(R.id.edt_username5);
         edtPassword = findViewById(R.id.edt_password6);
