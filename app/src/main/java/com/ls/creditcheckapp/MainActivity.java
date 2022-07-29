@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     OAuthToken token;
     private TokenAPI tokenAPI;
     private String displayResponse,historyResponse;
-    private int id,id1;
+    private int id,profID;
     RecyclerView recyclerView;
     private CreditHistoryAdapter creditHistoryAdapter;
     List<CreditScoreHistory> creditScoreList;
@@ -111,6 +111,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String  base64EncodedCredentials ;
     AdView adView;
     AdRequest adRequest;
+    private Bundle bundle;
+    private String userName, name,password,email,base64String, phoneNo;
 
 
     @Override
@@ -120,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         checkInternetConnection();
         gson= new Gson();
         profile= new Profile();
+        bundle= new Bundle();
         adView = new AdView(this);
         adRequest = new AdRequest.Builder().build();
         base64EncodedCredentials = "Basic" + Base64.encodeToString ((CLIENT_ID + ":" + SECRET) .getBytes (), Base64.NO_WRAP);
@@ -133,10 +136,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editText = findViewById(R.id.editText);
         postRequestButton = (Button) findViewById(R.id.post);
         postRequestButton.setOnClickListener(this);
+        bundle= getIntent().getExtras();
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {}
         });
+        if(bundle !=null){
+            profID=bundle.getInt("PROFILE_ID");
+            userName=bundle.getString("ProfileUserName","");
+            password=bundle.getString("ProfilePassword","");
+            name=bundle.getString("PROFILE_NAME");
+            phoneNo=bundle.getString("PROFILE_PHONE");
+            email=bundle.getString("PROFILE_EMAIL");
+
+        }
 
         postRequestButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
-        adView = findViewById(R.id.adViewLogIn);
+        adView = findViewById(R.id.adView);
         adView.loadAd(adRequest);
         //adView.setAdSize(AdSize.BANNER);
 
@@ -239,9 +252,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         tokenAPI = retrofit.create(TokenAPI.class);
     }
+    public String encodeToBase64() {
+        clientID= CLIENT_ID;
+        secret=SECRET;
+
+        String text = clientID + ":" + secret;
+
+        data64 = new byte[0];
+        data64 = text.getBytes(StandardCharsets.UTF_8);
+        base64=android.util.Base64.encodeToString(data64, android.util.Base64.DEFAULT);
+
+        return base64;
+    }
     private void createInterSwitchTokenAPI33() {
         String type="application/x-www-form-urlencoded";
-        String base64String=MyRetrofitClient.myRetrofitClient.encodeToBase64();
+        //base64String=this.encodeToBase64();
         //RequestBody requestBody = RequestBody.create(MediaType.parse("Content-type"), type);
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
@@ -252,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @NotNull
                     @Override
                     public okhttp3.Response intercept(@NotNull Interceptor.Chain chain) throws IOException {
-                        Request request = chain.request().newBuilder().addHeader("Authorization", base64String).build();
+                        Request request = chain.request().newBuilder().addHeader("Authorization", credentials).build();
                         return chain.proceed(request);
                     }
                 })
@@ -315,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @NotNull
             @Override
             public okhttp3.Response intercept(@NotNull Chain chain) throws IOException {
-                Request originalRequest = chain.request();
+                //Request originalRequest = chain.request();
 
                 Request request = chain.request().newBuilder().addHeader("Authorization", token.getAccessToken()).build();
                 return chain.proceed(request);

@@ -39,7 +39,7 @@ public class MyRetrofitClient {
 
     private MyRetrofitClient() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(myRetroApis.BASE_URL)
+                .baseUrl(TOKEN_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         myRetroApis = retrofit.create(RetroApis.class);

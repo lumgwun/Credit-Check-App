@@ -78,7 +78,7 @@ public class LoginAct extends AppCompatActivity {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {}
         });
-        adView = findViewById(R.id.adViewLogIn);
+        adView = findViewById(R.id.adView);
         adView.loadAd(adRequest);
         //adView.setAdSize(AdSize.BANNER);
 
@@ -151,6 +151,7 @@ public class LoginAct extends AppCompatActivity {
                 focusView.requestFocus();
             } else {
                 if (checkBox.isChecked()) {
+                    loadAd();
                     saveLoginDetails(userName, password);
                     startHomeActivity(userName,password);
 
@@ -166,7 +167,8 @@ public class LoginAct extends AppCompatActivity {
                 prefEditor = userPreferences.edit();
                 prefEditor.putString("ProfileUserName", userName);
                 prefEditor.putString("ProfilePassword", password);
-                prefEditor.commit();
+                prefEditor.apply();
+                loadAd();
 
                 Intent i = new Intent(LoginAct.this, MainActivity.class);
                 startActivity(i);

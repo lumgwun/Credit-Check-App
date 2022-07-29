@@ -15,20 +15,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CreditCheckApp"
         android:usesCleartextTraffic="true">
-        <activity android:name=".DonationAct">
-
-        </activity>
+        <activity android:name=".UsersListAct"></activity>
+        <activity android:name=".DonationAct"></activity>
         <activity android:name=".SignUpAct" />
-        <activity android:name=".LoginAct"
-            android:hardwareAccelerated="true"/>
+        <activity
+            android:name=".LoginAct"
+            android:hardwareAccelerated="true" />
         <activity
             android:name=".WelcomeAct"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"
-                    android:hardwareAccelerated="true"
-                    android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
+                <action
+                    android:name="android.intent.action.MAIN"
+                    android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+                    android:hardwareAccelerated="true" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -36,8 +38,8 @@
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:enabled="true"
-            android:hardwareAccelerated="true"
-            android:exported="true">
+            android:exported="true"
+            android:hardwareAccelerated="true">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
