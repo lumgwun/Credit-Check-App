@@ -1,7 +1,14 @@
 plugins {
     id 'com.android.application'
+    id 'com.google.secrets_gradle_plugin' version '0.4'
+    //id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+    //id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin' version '2.0.1' apply false
     //id 'org.springframework.boot' version '2.7.2'
 }
+def localPropertiesFile = rootProject.file("local.properties")
+def localProperties = new Properties()
+localProperties.load(new FileInputStream(localPropertiesFile))
+
 
 android {
     compileSdkVersion 32
@@ -14,6 +21,9 @@ android {
         versionCode 1
         versionName "1.0"
 
+        //buildConfigField "String", "CLIENT_ID", localProperties['client_id']
+
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -22,7 +32,20 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        buildTypes.each {
+            //it.buildConfigField "String", "TWILLO_NO", localProperties.getProperty("twillo_number")
+            //it.buildConfigField "String", "CLIENT_ID", localProperties.getProperty("client_id")
+            //it.buildConfigField "String", "SECRET", localProperties['secret']
+            it.buildConfigField 'String', 'TWILLO_NO', twillo_number1
+            it.buildConfigField 'String', 'CLIENT_ID', client_id1
+            it.buildConfigField 'String', 'SECRET', secret1
+
+        }
+
     }
+
+
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

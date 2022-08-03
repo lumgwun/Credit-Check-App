@@ -1,11 +1,6 @@
 package com.ls.creditcheckapp;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,18 +12,16 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
-import okio.BufferedSink;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.ls.creditcheckapp.Constant.CLIENT_ID;
-import static com.ls.creditcheckapp.Constant.REPORT_URL;
-import static com.ls.creditcheckapp.Constant.SECRET;
+import static com.ls.creditcheckapp.Constant.CLIENT_ID1;
+import static com.ls.creditcheckapp.Constant.SECRET1;
 import static com.ls.creditcheckapp.Constant.TOKEN_URL;
 
 @SuppressWarnings("deprecation")
-public class MyRetrofitClient {
-    protected static MyRetrofitClient myRetrofitClient = null;
+public class TokenRetrofitClient {
+    protected static TokenRetrofitClient tokenRetrofitClient = null;
     private static RetroApis myRetroApis;
     private static TokenAPI tokenAPI;
     private static Retrofit retrofit = null;
@@ -37,16 +30,20 @@ public class MyRetrofitClient {
     private  byte[] data64;
     String base64=null;
 
-    private MyRetrofitClient() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(TOKEN_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+    TokenRetrofitClient() {
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(TOKEN_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
         myRetroApis = retrofit.create(RetroApis.class);
+
+
     }
     public String encodeToBase64() {
-        clientID= CLIENT_ID;
-        secret=SECRET;
+        clientID= CLIENT_ID1;
+        secret=SECRET1;
 
         String text = clientID + ":" + secret;
 
@@ -59,7 +56,7 @@ public class MyRetrofitClient {
 
     static Retrofit getTokenClient() {
         String type="application/x-www-form-urlencoded";
-        String base64String=MyRetrofitClient.myRetrofitClient.encodeToBase64();
+        String base64String= TokenRetrofitClient.tokenRetrofitClient.encodeToBase64();
         RequestBody requestBody = RequestBody.create(MediaType.parse("Content-type"), type);
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
@@ -70,7 +67,7 @@ public class MyRetrofitClient {
                     @NotNull
                     @Override
                     public Response intercept(@NotNull Interceptor.Chain chain) throws IOException {
-                        Request request = chain.request().newBuilder().addHeader("Authorization", base64String).build();
+                        Request request = chain.request().newBuilder().addHeader("Authorization", TokenRetrofitClient.getInstance().encodeToBase64()).build();
                         return chain.proceed(request);
                     }
                 })
@@ -146,11 +143,11 @@ public class MyRetrofitClient {
         return retrofit;
     }
 
-    public static synchronized MyRetrofitClient getInstance() {
-        if (myRetrofitClient == null) {
-            myRetrofitClient = new MyRetrofitClient();
+    public static synchronized TokenRetrofitClient getInstance() {
+        if (tokenRetrofitClient == null) {
+            tokenRetrofitClient = new TokenRetrofitClient();
         }
-        return myRetrofitClient;
+        return tokenRetrofitClient;
     }
 
     public RetroApis getMyApi() {

@@ -86,10 +86,20 @@ public class SignUpAct extends AppCompatActivity {
         edtName = findViewById(R.id.s_name);
         edtEmail = findViewById(R.id.s_Email);
         edtPhone = findViewById(R.id.s_PhoneN);
+        adView = findViewById(R.id.adViewSignUp);
+
         profileID = ThreadLocalRandom.current().nextInt(1125, 10400);
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {}
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+                if(adView !=null){
+                    adView.loadAd(adRequest);
+
+                }
+
+                //adView.setAdSize(AdSize.BANNER);
+                //adView.setAdUnitId("ca-app-pub-2198582162916746/3725732565");
+            }
         });
 
         btnSignup = findViewById(R.id.btn_SignUp);
@@ -172,11 +182,13 @@ public class SignUpAct extends AppCompatActivity {
 
             }
         });
-        adView = findViewById(R.id.adView);
-        adView.loadAd(adRequest);
-        //adView.setAdSize(AdSize.BANNER);
+        adView = findViewById(R.id.adViewSignUp);
+        //adView.setAdUnitId("ca-app-pub-2198582162916746/3725732565");
+        if(adView !=null){
+            adView.loadAd(adRequest);
 
-        //adView.setAdUnitId("ca-app-pub-2198582162916746/8150169093");
+        }
+        //adView.setAdSize(AdSize.BANNER);
 
         adView.setAdListener(new AdListener() {
             @Override
@@ -252,6 +264,11 @@ public class SignUpAct extends AppCompatActivity {
                                         // Make sure to set your reference to null so you don't
                                         // show it a second time.
                                         SignUpAct.this.interstitialAd = null;
+                                        adView = findViewById(R.id.adViewSignUp);
+                                        //adView.loadAd(adRequest);
+                                        //adView.setAdSize(AdSize.BANNER);
+
+                                        //adView.setAdUnitId("ca-app-pub-2198582162916746/8150169093");
                                         Log.d("TAG", "The ad failed to show.");
                                     }
 
@@ -283,6 +300,11 @@ public class SignUpAct extends AppCompatActivity {
         if (interstitialAd != null) {
             interstitialAd.show(this);
         } else {
+            adView = findViewById(R.id.adViewSignUp);
+            if(adView !=null){
+                adView.loadAd(adRequest);
+
+            }
             Toast.makeText(this, "Ad did not load", Toast.LENGTH_SHORT).show();
 
         }
@@ -296,6 +318,10 @@ public class SignUpAct extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         showInterstitial();
+        adView = findViewById(R.id.adView);
+        //adView.loadAd(adRequest);
+
+        //adView.setAdUnitId("ca-app-pub-2198582162916746/8150169093");
         userPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
 
     }

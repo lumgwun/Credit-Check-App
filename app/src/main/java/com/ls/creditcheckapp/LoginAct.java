@@ -52,7 +52,7 @@ public class LoginAct extends AppCompatActivity {
     AdView adView;
     AdRequest adRequest;
 
-    private static final String AD_UNIT_BANNER = "ca-app-pub-2198582162916746/8150169093";
+    private static final String AD_UNIT_BANNER = "ca-app-pub-2198582162916746/6816582729";
     private static final String AD_UNIT_NATIVE_ID = "ca-app-pub-2198582162916746/4668652291";
     private static final String AD_UNIT_INTERSTITIAL_ID = "ca-app-pub-2198582162916746/8280594247";
 
@@ -73,13 +73,23 @@ public class LoginAct extends AppCompatActivity {
         btnForGotPassword = findViewById(R.id.btn_forgot_account_p6);
         userPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         profile = gson.fromJson(json, Profile.class);
+        adView = findViewById(R.id.adViewLogin);
         json = userPreferences.getString("LastProfileUsed", "");
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {}
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+                if(adView !=null){
+                    adView.loadAd(adRequest);
+
+                }
+            }
         });
-        adView = findViewById(R.id.adView);
-        adView.loadAd(adRequest);
+
+        if(adView !=null){
+            adView.loadAd(adRequest);
+
+        }
+
         //adView.setAdSize(AdSize.BANNER);
 
         //adView.setAdUnitId("ca-app-pub-2198582162916746/8150169093");

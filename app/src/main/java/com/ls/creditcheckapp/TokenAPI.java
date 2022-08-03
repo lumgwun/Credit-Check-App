@@ -16,21 +16,17 @@ public interface TokenAPI {
     String authorization= "<>";
 
     @FormUrlEncoded
-    @POST("client_credentials")
+    @POST("oauth2/token")
     Call<OAuthToken> postCredentials(@Field("grant_type") String grantType);
 
 
-    @FormUrlEncoded
+    //@FormUrlEncoded
     @GET("creditScores")
     Call<CreditScore> getCreditScore(@Query("client_credentials") String queryParam);
 
-    @FormUrlEncoded
+    //@FormUrlEncoded
     @GET("creditScores")
-    Call<List<CreditScoreHistory>> getCreditScoreHistory(@Query("client_credentials") String name);
+    Call<List<CreditScoreHistory>> getCreditScoreHistory(@Query("client_credentials") String phoneNo);
 
-
-
-    @GET("/1.1/users/show.json")
-    Call<String> getUserDetails(@Query("screen_name") String name);
 
 }

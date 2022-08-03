@@ -15,8 +15,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CreditCheckApp"
         android:usesCleartextTraffic="true">
-        <activity android:name=".UsersListAct"></activity>
-        <activity android:name=".DonationAct"></activity>
+        <activity android:name=".UsersListAct">
+
+        </activity>
+        <activity android:name=".DonationAct">
+
+        </activity>
         <activity android:name=".SignUpAct" />
         <activity
             android:name=".LoginAct"
@@ -48,6 +52,12 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-2198582162916746~3558998028" />
+        <meta-data
+            android:name = "CLIENT_ID"
+            android:value = "${client_id}"/>
+        <meta-data
+            android:name = "SECRET"
+            android:value = "${secret}"/>
     </application>
 
 </manifest>

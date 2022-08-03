@@ -83,6 +83,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:visibility="gone"
             android:background="@drawable/rect6h"
             android:gravity="center_horizontal"
             android:inputType="phone"
@@ -91,17 +92,6 @@
             android:hint="Type Your BVN Phone Number here"
             tools:layout_editor_absoluteX="42dp"
             tools:layout_editor_absoluteY="383dp" />
-
-        <com.google.android.gms.ads.AdView
-            xmlns:ads="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/adView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"
-            ads:adSize="BANNER"
-            ads:adUnitId="ca-app-pub-2198582162916746/8150169093">
-        </com.google.android.gms.ads.AdView>
 
 
         <Button
@@ -112,6 +102,7 @@
             android:background="@drawable/rect55"
             android:layout_marginEnd="10dp"
             android:padding="20dp"
+            android:onClick="takeAction"
             android:visibility="gone"
             android:layout_marginStart="10dp"
             tools:layout_editor_absoluteX="166dp"
@@ -136,10 +127,23 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="5dp"
-                android:padding="20dp"
+                android:padding="10dp"
                 android:background="@drawable/shape_layer_1a"
                 android:text="LOGOUT"
                 android:textColor="@color/colorPrimaryDark" />
+
+            <com.google.android.gms.ads.AdView
+                xmlns:ads="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/adView"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                ads:adSize="BANNER"
+                android:layout_alignParentBottom="true"
+                ads:adUnitId="ca-app-pub-2198582162916746/8150169093">
+            </com.google.android.gms.ads.AdView>
+
 
 
         </LinearLayout>
