@@ -138,27 +138,8 @@ public class MainActivity extends AppCompatActivity{
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
+        new GetToken().execute();
 
-        Passport.overrideApiBase("https://sandbox.interswitchng.com/passport");
-        RequestOptions options = RequestOptions.builder()
-                .setClientId(CLIENT_ID)
-                .setClientSecret(SECRET)
-                .build();
-        RequestOptions.RequestOptionsBuilder builder = RequestOptions.builder().setClientId(CLIENT_ID).setClientSecret(SECRET);
-        try {
-            tokenFromServer = new Passport(options).getAccessToken().getToken();
-        } catch (AuthorisationException e) {
-            e.printStackTrace();
-        } catch (APIException e) {
-            e.printStackTrace();
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-        } catch (APIConnectionException e) {
-            e.printStackTrace();
-        } catch (InvalidRequestException e) {
-            e.printStackTrace();
-        }
-        builder.setAccessToken(tokenFromServer);
         //options = builder.build();
 
 
@@ -190,7 +171,7 @@ public class MainActivity extends AppCompatActivity{
             txtCreditScore.setText(MessageFormat.format("{0}", " It takes some time for the result to come up"));
         }
 
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+       /* MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {
                 //adView.setAdSize(AdSize.BANNER);
@@ -199,7 +180,7 @@ public class MainActivity extends AppCompatActivity{
 
                 }
             }
-        });
+        });*/
 
         if(bundle !=null){
             profID=bundle.getInt("PROFILE_ID");
@@ -216,8 +197,8 @@ public class MainActivity extends AppCompatActivity{
                 editText = findViewById(R.id.editText);
                 String editTextInput = editText.getText().toString();
                 if (!editTextInput.isEmpty()) {
-                    createCreditScoreAPI(token);
-                    createHistoryAPI(token);
+                    createCreditScoreAPI(token,tokenFromServer);
+                    createHistoryAPI(token,tokenFromServer);
                 }else {
                     Toast.makeText(MainActivity.this, "Please provide your BVN Phone Number", Toast.LENGTH_LONG).show();
                 }
@@ -275,6 +256,68 @@ public class MainActivity extends AppCompatActivity{
 
 
     }
+    @SuppressLint("StaticFieldLeak")
+    private class GetToken extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            adView = findViewById(R.id.adView);
+            MobileAds.initialize(MainActivity.this, new OnInitializationCompleteListener() {
+                @Override
+                public void onInitializationComplete(@NotNull InitializationStatus initializationStatus) {
+                    adView.loadAd(adRequest);
+                }
+            });
+            super.onPreExecute();
+
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            Passport.overrideApiBase("https://sandbox.interswitchng.com/passport");
+            RequestOptions options = RequestOptions.builder()
+                    .setClientId(CLIENT_ID)
+                    .setClientSecret(SECRET)
+                    .build();
+            RequestOptions.RequestOptionsBuilder builder = RequestOptions.builder().setClientId(CLIENT_ID).setClientSecret(SECRET);
+            try {
+                tokenFromServer = new Passport(options).getAccessToken().getToken();
+            } catch (AuthorisationException | APIException | AuthenticationException | APIConnectionException | InvalidRequestException e) {
+                e.printStackTrace();
+            }
+            builder.setAccessToken(tokenFromServer);
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            adView = findViewById(R.id.adView);
+            MobileAds.initialize(MainActivity.this, new OnInitializationCompleteListener() {
+                @Override
+                public void onInitializationComplete(InitializationStatus initializationStatus) {
+                    adView.loadAd(adRequest);
+                }
+            });
+            if(tokenFromServer !=null){
+                postRequestButton.setVisibility(View.VISIBLE);
+                createHistoryAPI(token,tokenFromServer);
+                createCreditScoreAPI(token,tokenFromServer);
+                //txtInfo.setVisibility(View.VISIBLE);
+                //txtInfo.setText(MessageFormat.format("Token{0}", tokenFromServer));
+                Toast.makeText(MainActivity.this, "Token: " + tokenFromServer, Toast.LENGTH_LONG).show();
+            }else {
+                txtCreditScore.setVisibility(View.VISIBLE);
+                txtCreditScore.setText(MessageFormat.format("{0}", " It takes some time for the result to come up"));
+            }
+            super.onPostExecute(result);
+
+        }
+
+    }
+
     public boolean hasInternetConnection() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -297,231 +340,15 @@ public class MainActivity extends AppCompatActivity{
         builder.setPositiveButton(R.string.button_ok, null);
         builder.show();
     }
-    private void createInterSwitchTokenAPI() {
-        String type="application/x-www-form-urlencoded";
-        editText = findViewById(R.id.editText);
-        //base64EncodedCredentials = "Basic" + Base64.encodeToString ((CLIENT_ID + ":" + SECRET) .getBytes (), Base64.NO_WRAP);
 
-        base64EncodedCredentials = Base64.encodeToString ((CLIENT_ID + ":" + SECRET) .getBytes (), Base64.NO_WRAP);
-
-        //RequestBody requestBody = RequestBody.create(MediaType.parse("Content-type"), type);
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
-            @NotNull
-            @Override
-            public okhttp3.Response intercept(@NotNull Chain chain) throws IOException {
-
-                Request originalRequest = chain.request();
-                //.header("Authorization", "Bearer ${tokenResponse.value.access_token}")
-                Request.Builder builder = originalRequest.newBuilder().header("Authorization", "Basic ${base64EncodedCredentials}").addHeader("Content-Type", type);
-
-
-                /*Request.Builder builder = originalRequest.newBuilder().header("Authorization",
-                        token != null ? token.getAuthorization() : base64EncodedCredentials).addHeader("Content-Type", type);*/
-
-                Request newRequest = builder.build();
-                return chain.proceed(newRequest);
-            }
-        }).addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC))
-                .readTimeout(160, TimeUnit.SECONDS)
-                .writeTimeout(160, TimeUnit.SECONDS)
-                .connectTimeout(160, TimeUnit.SECONDS).build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(TOKEN_URL)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        tokenAPI = retrofit.create(TokenAPI.class);
-
-        tokenAPI.postCredentials("client_credentials").enqueue(tokenCallback);
-
-
-    }
-    Callback<OAuthToken> tokenCallback = new Callback<OAuthToken>() {
-        @Override
-        public void onResponse(@NotNull Call<OAuthToken> call, Response<OAuthToken> response) {
-            if (response.isSuccessful()) {
-                token = response.body();
-                txtCreditScore.setVisibility(View.VISIBLE);
-                txtCreditHistory.setVisibility(View.VISIBLE);
-                postRequestButton = (Button) findViewById(R.id.post);
-                postRequestButton.setVisibility(View.VISIBLE);
-                txtInfo = findViewById(R.id.textViewMain);
-                editText = findViewById(R.id.editText);
-                editText.setVisibility(View.VISIBLE);
-                txtInfo.setVisibility(View.VISIBLE);
-                postRequestButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        editText = findViewById(R.id.editText);
-                        String editTextInput = editText.getText().toString();
-                        if (!editTextInput.isEmpty()) {
-                            createCreditScoreAPI(token);
-                            createHistoryAPI(token);
-                        }else {
-                            Toast.makeText(MainActivity.this, "Please provide your BVN Phone Number", Toast.LENGTH_LONG).show();
-                        }
-                        MobileAds.initialize(MainActivity.this, new OnInitializationCompleteListener() {
-                            @Override
-                            public void onInitializationComplete(InitializationStatus initializationStatus) {
-                                adView.loadAd(adRequest);
-                            }
-                        });
-
-
-                        //tokenAPI.getCreditScore(editTextInput).enqueue(creditScoreCallback);
-                        //tokenAPI.getCreditScoreHistory(editTextInput).enqueue(creditScoreHistoryCallback);
-
-
-                    }
-
-                });
-                txtInfo.setText(MessageFormat.format("Token{0}", token));
-                Toast.makeText(MainActivity.this, "Code: " + response.code() + "Message: " + response.message(), Toast.LENGTH_LONG).show();
-                txtCreditScore.setText(MessageFormat.format("", "Code: " + response.code() + "Message: " + response.message()));
-
-
-                //createCreditScoreAPI(token);
-                //createHistoryAPI(token);
-
-            } else {
-                txtInfo.setVisibility(View.VISIBLE);
-                txtInfo.setText(MessageFormat.format("{0}", " It takes some time for the result to come up"));
-                Toast.makeText(MainActivity.this, "Failure while requesting token", Toast.LENGTH_LONG).show();
-                Log.d("RequestTokenCallback", "Code: " + response.code() + "Message: " + response.message());
-            }
-        }
-
-        @Override
-        public void onFailure(Call<OAuthToken> call, Throwable t) {
-            t.printStackTrace();
-        }
-    };
-    private void createTokenPost() {
-        String type="application/x-www-form-urlencoded";
-        editText = findViewById(R.id.editText);
-        //base64EncodedCredentials = "Basic" + Base64.encodeToString ((CLIENT_ID + ":" + SECRET) .getBytes (), Base64.NO_WRAP);
-
-        base64EncodedCredentials = Base64.encodeToString ((CLIENT_ID + ":" + SECRET) .getBytes (), Base64.NO_WRAP);
-
-        //RequestBody requestBody = RequestBody.create(MediaType.parse("Content-type"), type);
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
-            @NotNull
-            @Override
-            public okhttp3.Response intercept(@NotNull Chain chain) throws IOException {
-
-                Request originalRequest = chain.request();
-                //.header("Authorization", "Bearer ${tokenResponse.value.access_token}")
-                Request.Builder builder = originalRequest.newBuilder().header("Authorization", "Basic ${base64EncodedCredentials}").addHeader("Content-Type", type);
-
-
-                /*Request.Builder builder = originalRequest.newBuilder().header("Authorization",
-                        token != null ? token.getAuthorization() : base64EncodedCredentials).addHeader("Content-Type", type);*/
-
-                Request newRequest = builder.build();
-                return chain.proceed(newRequest);
-            }
-        }).addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC))
-                .readTimeout(160, TimeUnit.SECONDS)
-                .writeTimeout(160, TimeUnit.SECONDS)
-                .connectTimeout(160, TimeUnit.SECONDS).build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(TOKEN_URL)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        tokenAPI = retrofit.create(TokenAPI.class);
-
-        tokenAPI.postForToken("client_credentials").enqueue(tokenCallbackStr);
-
-    }
-    Callback<String> tokenCallbackStr = new Callback<String>() {
-        @Override
-        public void onResponse(@NotNull Call<String> call, Response<String> response) {
-            if (response.isSuccessful()) {
-                String tokenStr = response.body();
-                txtCreditScore.setVisibility(View.VISIBLE);
-                txtCreditHistory.setVisibility(View.VISIBLE);
-                postRequestButton = (Button) findViewById(R.id.post);
-                postRequestButton.setVisibility(View.VISIBLE);
-                txtInfo = findViewById(R.id.textViewMain);
-                editText = findViewById(R.id.editText);
-                editText.setVisibility(View.VISIBLE);
-                txtInfo.setVisibility(View.VISIBLE);
-                try {
-                    if (response.body() != null) {
-                        jsonObject = new JSONObject(response.body().toString());
-                    }
-                    if (jsonObject != null && jsonObject.getString("responseCode").contains("00")) {
-
-                        String ourToken = jsonObject.getString("msisdn");
-                        myCreditScore = "Our Token: "+ourToken;
-
-                    }
-                    //displayResponse += text + " Page\n" + total + " Total\n" + totalPages + " Total Pages\n";
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                postRequestButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        editText = findViewById(R.id.editText);
-                        String editTextInput = editText.getText().toString();
-                        if (!editTextInput.isEmpty()) {
-                            //createCreditScoreAPI(tokenStr);
-                           // createHistoryAPI(tokenStr);
-                        }else {
-                            Toast.makeText(MainActivity.this, "Please provide your BVN Phone Number", Toast.LENGTH_LONG).show();
-                        }
-                        MobileAds.initialize(MainActivity.this, new OnInitializationCompleteListener() {
-                            @Override
-                            public void onInitializationComplete(InitializationStatus initializationStatus) {
-                                adView.loadAd(adRequest);
-                            }
-                        });
-
-
-                        //tokenAPI.getCreditScore(editTextInput).enqueue(creditScoreCallback);
-                        //tokenAPI.getCreditScoreHistory(editTextInput).enqueue(creditScoreHistoryCallback);
-
-
-                    }
-
-                });
-                txtInfo.setText(MessageFormat.format("Token{0}", tokenStr));
-                Toast.makeText(MainActivity.this, "Code: " + response.code() + "Message: " + response.message(), Toast.LENGTH_LONG).show();
-                txtCreditScore.setText(MessageFormat.format("", "Code: " + response.code() + "Message: " + response.message()));
-
-
-                //createCreditScoreAPI(token);
-                //createHistoryAPI(token);
-
-            } else {
-                txtInfo.setVisibility(View.VISIBLE);
-                txtInfo.setText(MessageFormat.format("{0}", " It takes some time for the result to come up"));
-                Toast.makeText(MainActivity.this, "Failure while requesting token", Toast.LENGTH_LONG).show();
-                Log.d("RequestTokenCallback", "Code: " + response.code() + "Message: " + response.message());
-            }
-        }
-
-        @Override
-        public void onFailure(Call<String> call, Throwable t) {
-            t.printStackTrace();
-        }
-    };
-
-
-    private void createCreditScoreAPI(OAuthToken token) {
+    private void createCreditScoreAPI(OAuthToken token,String tokenFromServer) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @NotNull
             @Override
             public okhttp3.Response intercept(@NotNull Chain chain) throws IOException {
                 //Request originalRequest = chain.request();
 
-                Request request = chain.request().newBuilder().addHeader("Authorization", token.getAccessToken()).build();
+                Request request = chain.request().newBuilder().addHeader("Authorization", tokenFromServer).build();
                 return chain.proceed(request);
             }
         }).addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
@@ -585,14 +412,14 @@ public class MainActivity extends AppCompatActivity{
             t.printStackTrace();
         }
     };
-    private void createHistoryAPI(OAuthToken token) {
+    private void createHistoryAPI(OAuthToken token,String tokenFromServer) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @NotNull
             @Override
             public okhttp3.Response intercept(@NotNull Chain chain) throws IOException {
                 Request originalRequest = chain.request();
 
-                Request request = chain.request().newBuilder().addHeader("Authorization", token.getAccessToken()).build();
+                Request request = chain.request().newBuilder().addHeader("Authorization", tokenFromServer).build();
                 return chain.proceed(request);
             }
         }).addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
