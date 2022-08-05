@@ -83,7 +83,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:visibility="gone"
             android:background="@drawable/rect6h"
             android:gravity="center_horizontal"
             android:inputType="phone"
@@ -103,7 +102,6 @@
             android:layout_marginEnd="10dp"
             android:padding="20dp"
             android:onClick="takeAction"
-            android:visibility="gone"
             android:layout_marginStart="10dp"
             tools:layout_editor_absoluteX="166dp"
             tools:layout_editor_absoluteY="445dp" />
@@ -130,7 +128,8 @@
                 android:padding="10dp"
                 android:background="@drawable/shape_layer_1a"
                 android:text="LOGOUT"
-                android:textColor="@color/colorPrimaryDark" />
+                android:layout_marginBottom="10dp"
+                android:textColor="@color/white" />
 
             <com.google.android.gms.ads.AdView
                 xmlns:ads="http://schemas.android.com/apk/res-auto"

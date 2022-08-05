@@ -19,13 +19,17 @@ public interface TokenAPI {
     @POST("oauth2/token")
     Call<OAuthToken> postCredentials(@Field("grant_type") String grantType);
 
+    @FormUrlEncoded
+    @POST("oauth2/token")
+    Call<String> postForToken(@Field("grant_type") String grantType);
+
 
     //@FormUrlEncoded
-    @GET("creditScores")
+    @GET("msisdn")
     Call<CreditScore> getCreditScore(@Query("client_credentials") String queryParam);
 
     //@FormUrlEncoded
-    @GET("creditScores")
+    @GET("msisdn")
     Call<List<CreditScoreHistory>> getCreditScoreHistory(@Query("client_credentials") String phoneNo);
 
 

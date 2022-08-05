@@ -17,6 +17,8 @@ public class DonationAct extends AppCompatActivity {
     WebView mywebView;
     private AppCompatButton btnSub,btnOntTimeD;
     private String weblink;
+    private String fluterOneTime="https://business.quickteller.com/link/pay/CreditcheckA/";
+    private String flutterSub="https://business.quickteller.com/link/pay/CreditReport";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -30,14 +32,14 @@ public class DonationAct extends AppCompatActivity {
         btnOntTimeD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                weblink=PAYSTACK_FIX;
+                weblink=fluterOneTime;
 
             }
         });
         btnSub.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                weblink=PAYSTACK_SUB;
+                weblink=flutterSub;
 
             }
         });

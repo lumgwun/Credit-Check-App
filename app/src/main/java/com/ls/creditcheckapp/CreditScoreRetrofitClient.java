@@ -6,10 +6,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static com.ls.creditcheckapp.Constant.SCORE_URL;
 import static com.ls.creditcheckapp.Constant.TOKEN_URL;
 
+@SuppressWarnings("InstantiationOfUtilityClass")
 public class CreditScoreRetrofitClient {
     protected static CreditScoreRetrofitClient client = null;
     private static RetroApis myRetroApis;
-    private static TokenAPI tokenAPI;
     private static Retrofit retrofit = null;
 
     CreditScoreRetrofitClient() {

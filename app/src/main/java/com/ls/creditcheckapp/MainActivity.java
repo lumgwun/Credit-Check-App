@@ -36,6 +36,13 @@ import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.gson.Gson;
+import com.interswitchng.sdk.auth.Passport;
+import com.interswitchng.sdk.exception.APIConnectionException;
+import com.interswitchng.sdk.exception.APIException;
+import com.interswitchng.sdk.exception.AuthenticationException;
+import com.interswitchng.sdk.exception.AuthorisationException;
+import com.interswitchng.sdk.exception.InvalidRequestException;
+import com.interswitchng.sdk.model.RequestOptions;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -80,7 +87,6 @@ public class MainActivity extends AppCompatActivity{
     String clientID,secret,msisdn,score,dateCreated,msisdn1,score1,dateCreated1;
     private  byte[] data64;
     String base64=null;
-
     private static final String EMPTY_STRING = "";
     private static final String PREF_NAME = "CreditCheck";
     Profile profile;
@@ -103,6 +109,7 @@ public class MainActivity extends AppCompatActivity{
     AdRequest adRequest;
     private Bundle bundle;
     private String userName, name,password,email,base64String, phoneNo;
+    private String myCreditScore;
 
     String CLIENT_ID = "IKIA0BC31B2FC9BB9A4A770D90430DF9906730728165";
     //String CLIENT_ID = CLIENT_ID1;
@@ -113,6 +120,7 @@ public class MainActivity extends AppCompatActivity{
     private static final String AD_UNIT_NATIVE_ID = "ca-app-pub-2198582162916746/4668652291";
     private static final String AD_UNIT_INTERSTITIAL_ID = "ca-app-pub-2198582162916746/8280594247";
     private InterstitialAd interstitialAd;
+    private JSONObject jsonObject = null;;
 
 
     private String credentials = Credentials.basic("IKIA0BC31B2FC9BB9A4A770D90430DF9906730728165", "560181E348ACA75967C55B8F94441E1ADB864973");
@@ -131,6 +139,28 @@ public class MainActivity extends AppCompatActivity{
             e.printStackTrace();
         }
 
+        Passport.overrideApiBase("https://sandbox.interswitchng.com/passport");
+        RequestOptions options = RequestOptions.builder()
+                .setClientId(CLIENT_ID)
+                .setClientSecret(SECRET)
+                .build();
+        RequestOptions.RequestOptionsBuilder builder = RequestOptions.builder().setClientId(CLIENT_ID).setClientSecret(SECRET);
+        try {
+            tokenFromServer = new Passport(options).getAccessToken().getToken();
+        } catch (AuthorisationException e) {
+            e.printStackTrace();
+        } catch (APIException e) {
+            e.printStackTrace();
+        } catch (AuthenticationException e) {
+            e.printStackTrace();
+        } catch (APIConnectionException e) {
+            e.printStackTrace();
+        } catch (InvalidRequestException e) {
+            e.printStackTrace();
+        }
+        builder.setAccessToken(tokenFromServer);
+        //options = builder.build();
+
 
         gson= new Gson();
         profile= new Profile();
@@ -145,11 +175,21 @@ public class MainActivity extends AppCompatActivity{
         txtCreditHistory = findViewById(R.id.textCreditHistory);
         txtInfo = findViewById(R.id.textViewMain);
         //createInterSwitchTokenAPI33();
-        createInterSwitchTokenAPI();
+        //createInterSwitchTokenAPI();
         editText = findViewById(R.id.editText);
         postRequestButton = (Button) findViewById(R.id.post);
         bundle= getIntent().getExtras();
         adView = findViewById(R.id.adView);
+        if(tokenFromServer !=null){
+            postRequestButton.setVisibility(View.VISIBLE);
+            txtInfo.setVisibility(View.VISIBLE);
+            txtInfo.setText(MessageFormat.format("Token{0}", tokenFromServer));
+            Toast.makeText(MainActivity.this, "Token: " + tokenFromServer, Toast.LENGTH_LONG).show();
+        }else {
+            txtCreditScore.setVisibility(View.VISIBLE);
+            txtCreditScore.setText(MessageFormat.format("{0}", " It takes some time for the result to come up"));
+        }
+
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {
@@ -170,6 +210,32 @@ public class MainActivity extends AppCompatActivity{
             email=bundle.getString("PROFILE_EMAIL");
 
         }
+        postRequestButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editText = findViewById(R.id.editText);
+                String editTextInput = editText.getText().toString();
+                if (!editTextInput.isEmpty()) {
+                    createCreditScoreAPI(token);
+                    createHistoryAPI(token);
+                }else {
+                    Toast.makeText(MainActivity.this, "Please provide your BVN Phone Number", Toast.LENGTH_LONG).show();
+                }
+                MobileAds.initialize(MainActivity.this, new OnInitializationCompleteListener() {
+                    @Override
+                    public void onInitializationComplete(InitializationStatus initializationStatus) {
+                        adView.loadAd(adRequest);
+                    }
+                });
+
+
+                //tokenAPI.getCreditScore(editTextInput).enqueue(creditScoreCallback);
+                //tokenAPI.getCreditScoreHistory(editTextInput).enqueue(creditScoreHistoryCallback);
+
+
+            }
+
+        });
 
 
         adView.setAdListener(new AdListener() {
@@ -234,8 +300,9 @@ public class MainActivity extends AppCompatActivity{
     private void createInterSwitchTokenAPI() {
         String type="application/x-www-form-urlencoded";
         editText = findViewById(R.id.editText);
-        base64EncodedCredentials = "Basic" + Base64.encodeToString ((CLIENT_ID + ":" + SECRET) .getBytes (), Base64.NO_WRAP);
+        //base64EncodedCredentials = "Basic" + Base64.encodeToString ((CLIENT_ID + ":" + SECRET) .getBytes (), Base64.NO_WRAP);
 
+        base64EncodedCredentials = Base64.encodeToString ((CLIENT_ID + ":" + SECRET) .getBytes (), Base64.NO_WRAP);
 
         //RequestBody requestBody = RequestBody.create(MediaType.parse("Content-type"), type);
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
@@ -244,9 +311,12 @@ public class MainActivity extends AppCompatActivity{
             public okhttp3.Response intercept(@NotNull Chain chain) throws IOException {
 
                 Request originalRequest = chain.request();
+                //.header("Authorization", "Bearer ${tokenResponse.value.access_token}")
+                Request.Builder builder = originalRequest.newBuilder().header("Authorization", "Basic ${base64EncodedCredentials}").addHeader("Content-Type", type);
 
-                Request.Builder builder = originalRequest.newBuilder().header("Authorization",
-                        token != null ? token.getAuthorization() : credentials);
+
+                /*Request.Builder builder = originalRequest.newBuilder().header("Authorization",
+                        token != null ? token.getAuthorization() : base64EncodedCredentials).addHeader("Content-Type", type);*/
 
                 Request newRequest = builder.build();
                 return chain.proceed(newRequest);
@@ -317,7 +387,7 @@ public class MainActivity extends AppCompatActivity{
 
             } else {
                 txtInfo.setVisibility(View.VISIBLE);
-                txtInfo.setText(MessageFormat.format("Token{0}", "No Token"));
+                txtInfo.setText(MessageFormat.format("{0}", " It takes some time for the result to come up"));
                 Toast.makeText(MainActivity.this, "Failure while requesting token", Toast.LENGTH_LONG).show();
                 Log.d("RequestTokenCallback", "Code: " + response.code() + "Message: " + response.message());
             }
@@ -325,6 +395,120 @@ public class MainActivity extends AppCompatActivity{
 
         @Override
         public void onFailure(Call<OAuthToken> call, Throwable t) {
+            t.printStackTrace();
+        }
+    };
+    private void createTokenPost() {
+        String type="application/x-www-form-urlencoded";
+        editText = findViewById(R.id.editText);
+        //base64EncodedCredentials = "Basic" + Base64.encodeToString ((CLIENT_ID + ":" + SECRET) .getBytes (), Base64.NO_WRAP);
+
+        base64EncodedCredentials = Base64.encodeToString ((CLIENT_ID + ":" + SECRET) .getBytes (), Base64.NO_WRAP);
+
+        //RequestBody requestBody = RequestBody.create(MediaType.parse("Content-type"), type);
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
+            @NotNull
+            @Override
+            public okhttp3.Response intercept(@NotNull Chain chain) throws IOException {
+
+                Request originalRequest = chain.request();
+                //.header("Authorization", "Bearer ${tokenResponse.value.access_token}")
+                Request.Builder builder = originalRequest.newBuilder().header("Authorization", "Basic ${base64EncodedCredentials}").addHeader("Content-Type", type);
+
+
+                /*Request.Builder builder = originalRequest.newBuilder().header("Authorization",
+                        token != null ? token.getAuthorization() : base64EncodedCredentials).addHeader("Content-Type", type);*/
+
+                Request newRequest = builder.build();
+                return chain.proceed(newRequest);
+            }
+        }).addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC))
+                .readTimeout(160, TimeUnit.SECONDS)
+                .writeTimeout(160, TimeUnit.SECONDS)
+                .connectTimeout(160, TimeUnit.SECONDS).build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TOKEN_URL)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        tokenAPI = retrofit.create(TokenAPI.class);
+
+        tokenAPI.postForToken("client_credentials").enqueue(tokenCallbackStr);
+
+    }
+    Callback<String> tokenCallbackStr = new Callback<String>() {
+        @Override
+        public void onResponse(@NotNull Call<String> call, Response<String> response) {
+            if (response.isSuccessful()) {
+                String tokenStr = response.body();
+                txtCreditScore.setVisibility(View.VISIBLE);
+                txtCreditHistory.setVisibility(View.VISIBLE);
+                postRequestButton = (Button) findViewById(R.id.post);
+                postRequestButton.setVisibility(View.VISIBLE);
+                txtInfo = findViewById(R.id.textViewMain);
+                editText = findViewById(R.id.editText);
+                editText.setVisibility(View.VISIBLE);
+                txtInfo.setVisibility(View.VISIBLE);
+                try {
+                    if (response.body() != null) {
+                        jsonObject = new JSONObject(response.body().toString());
+                    }
+                    if (jsonObject != null && jsonObject.getString("responseCode").contains("00")) {
+
+                        String ourToken = jsonObject.getString("msisdn");
+                        myCreditScore = "Our Token: "+ourToken;
+
+                    }
+                    //displayResponse += text + " Page\n" + total + " Total\n" + totalPages + " Total Pages\n";
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                postRequestButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        editText = findViewById(R.id.editText);
+                        String editTextInput = editText.getText().toString();
+                        if (!editTextInput.isEmpty()) {
+                            //createCreditScoreAPI(tokenStr);
+                           // createHistoryAPI(tokenStr);
+                        }else {
+                            Toast.makeText(MainActivity.this, "Please provide your BVN Phone Number", Toast.LENGTH_LONG).show();
+                        }
+                        MobileAds.initialize(MainActivity.this, new OnInitializationCompleteListener() {
+                            @Override
+                            public void onInitializationComplete(InitializationStatus initializationStatus) {
+                                adView.loadAd(adRequest);
+                            }
+                        });
+
+
+                        //tokenAPI.getCreditScore(editTextInput).enqueue(creditScoreCallback);
+                        //tokenAPI.getCreditScoreHistory(editTextInput).enqueue(creditScoreHistoryCallback);
+
+
+                    }
+
+                });
+                txtInfo.setText(MessageFormat.format("Token{0}", tokenStr));
+                Toast.makeText(MainActivity.this, "Code: " + response.code() + "Message: " + response.message(), Toast.LENGTH_LONG).show();
+                txtCreditScore.setText(MessageFormat.format("", "Code: " + response.code() + "Message: " + response.message()));
+
+
+                //createCreditScoreAPI(token);
+                //createHistoryAPI(token);
+
+            } else {
+                txtInfo.setVisibility(View.VISIBLE);
+                txtInfo.setText(MessageFormat.format("{0}", " It takes some time for the result to come up"));
+                Toast.makeText(MainActivity.this, "Failure while requesting token", Toast.LENGTH_LONG).show();
+                Log.d("RequestTokenCallback", "Code: " + response.code() + "Message: " + response.message());
+            }
+        }
+
+        @Override
+        public void onFailure(Call<String> call, Throwable t) {
             t.printStackTrace();
         }
     };
@@ -357,6 +541,7 @@ public class MainActivity extends AppCompatActivity{
         @Override
         public void onResponse(Call<CreditScore> call, Response<CreditScore> response) {
             if (response.isSuccessful()) {
+
                 CreditScore creditScore = response.body();
 
                 if (creditScore != null) {
@@ -365,11 +550,29 @@ public class MainActivity extends AppCompatActivity{
                     score = creditScore.getScore();
                     dateCreated = creditScore.getDateCreated();
                 }
+                try {
+
+                    if (response.body() != null) {
+                        jsonObject = new JSONObject(response.body().toString());
+                    }
+                    if (jsonObject != null && jsonObject.getString("responseCode").contains("00")) {
+
+                        String phoneNo = jsonObject.getString("msisdn");
+                        String score = jsonObject.getString("score");
+                        String dateCreated4 = jsonObject.getString("dateCreated");
+                        myCreditScore = "Phone No: "+phoneNo+"\n"+"score: "+score+"\n"+"Date Created: "+dateCreated4;
+
+                    }
+                    //displayResponse += text + " Page\n" + total + " Total\n" + totalPages + " Total Pages\n";
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
                 displayResponse += id + " Phone\n" + msisdn + " Score\n" + score + " dateCreated\n"+dateCreated;
                 txtCreditScore = findViewById(R.id.textCreditScore);
+                txtCreditScore.setVisibility(View.VISIBLE);
                 if (displayResponse == null) txtCreditScore.setText("no value");
-                else txtCreditScore.setText(displayResponse);
+                else txtCreditScore.setText(myCreditScore);
             } else {
                 Toast.makeText(MainActivity.this, "Failure while requesting Credit Score", Toast.LENGTH_LONG).show();
                 txtCreditScore.setText(MessageFormat.format("Error!{0}", response.message()));
@@ -424,12 +627,8 @@ public class MainActivity extends AppCompatActivity{
 
                     JSONObject jsonObject = new JSONObject(s);
 
-                    JSONArray jsonArray1 = jsonObject.getJSONArray("users");
+                    JSONArray jsonArray1 = jsonObject.getJSONArray("creditScores");
 
-                    /*JSONObject jsonObject1 =jsonArray1.getJSONObject(index_no);
-                    String id = jsonObject1.getString("id");
-                    String name = jsonObject1.getString("name");
-                    String my_users = "User ID: "+id+"\n"+"Name: "+name;*/
 
 
                 } catch (JSONException e) {

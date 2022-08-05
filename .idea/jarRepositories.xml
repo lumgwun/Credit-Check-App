@@ -31,5 +31,85 @@
       <option name="name" value="maven" />
       <option name="url" value="https://jitpack.io" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven3" />
+      <option name="name" value="maven3" />
+      <option name="url" value="http://dl.bintray.com/techquest/maven-repo" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven8" />
+      <option name="name" value="maven8" />
+      <option name="url" value="https://maven.restlet.com" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven10" />
+      <option name="name" value="maven10" />
+      <option name="url" value="https://mvnrepository.com/artifact/com.android.tools.lint/lint-gradle-api" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven11" />
+      <option name="name" value="maven11" />
+      <option name="url" value="https://github.com/suckgamony/RapidDecoder/raw/master/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven12" />
+      <option name="name" value="maven12" />
+      <option name="url" value="https://repo.maven.apache.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven16" />
+      <option name="name" value="maven16" />
+      <option name="url" value="file:////local/repo" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven4" />
+      <option name="name" value="maven4" />
+      <option name="url" value="https://maven.fabric.io/public" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven15" />
+      <option name="name" value="maven15" />
+      <option name="url" value="https://repo.example.com/maven2/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven5" />
+      <option name="name" value="maven5" />
+      <option name="url" value="https://maven.java.net/content/groups/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven6" />
+      <option name="name" value="maven6" />
+      <option name="url" value="https://maven.springframework.org/release" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven19" />
+      <option name="name" value="maven19" />
+      <option name="url" value="https://plugins.gradle.org/m2/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven7" />
+      <option name="name" value="maven7" />
+      <option name="url" value="https://oss.jfrog.org/artifactory/oss-snapshot-local/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven13" />
+      <option name="name" value="maven13" />
+      <option name="url" value="https://repo.spring.io/release" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven14" />
+      <option name="name" value="maven14" />
+      <option name="url" value="https://repository.jboss.org/maven2/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven3" />
+      <option name="name" value="maven3" />
+      <option name="url" value="https://jcenter.bintray.com" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven21" />
+      <option name="name" value="maven21" />
+      <option name="url" value="https://maven.springframework.org/release/com/" />
+    </remote-repository>
   </component>
 </project>
